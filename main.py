@@ -77,7 +77,7 @@ messages = [
     Also you should rework the question to make it more concise and clear.
     After you have all the information, you will use the `create_ticket` tool to create the ticket.
     Answer the question in a friendly and helpful manner.
-    Do not answer irrelevant questions from the user.
+    Irrelevant queries should be ignored. Do not answer them and tell the user that you are not able to answer them.
     """},
 ]
 
