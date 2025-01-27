@@ -73,15 +73,27 @@ messages = [
     After you have answered the question, you will ask the user if they would like to create a ticket.
     If they would like to create a ticket, you should get the user's name.
     And you should determine the level of the ticket based on the question. Based on the question, the level should be LOW, MEDIUM, or HIGH.
+    Do not ask the user for the level of the ticket. Just determine it based on the question.
     After you have all the information, you will use the `create_ticket` tool to create the ticket.
     """},
 ]
 
 client = OpenAI(api_key=env('OPENAI_API_KEY'))
 
-st.title("Hooli Helpdesk")
+st.title("Hooli Helpdesk")  
+st.logo("./images/hooli.jpeg", size="large")
 
-with st.sidebar:
+col1, col2 = st.columns([3, 2])
+
+
+with col2:
+    st.header("Opened tickets")
+    db = TicketDB()
+    tickets = db.get_all_tickets()
+    st.dataframe(tickets)
+
+with col1:
+    st.header("Try our new AI chatbot!")
     chat_messages = st.container(height=900)
     
     if "messages" not in st.session_state:
@@ -96,7 +108,7 @@ with st.sidebar:
             st.markdown(message["content"])
 
 
-    if prompt := st.chat_input("Ask a question to get started."):
+    if prompt := st.chat_input("Ask a question to get started"):
         st.session_state.messages.append({"role": "user", "content": prompt})
         
         with chat_messages.chat_message("user"):
