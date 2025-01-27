@@ -83,6 +83,8 @@ messages = [
     Answer the question in a friendly and helpful manner.
     Irrelevant queries should be ignored. Do not answer them and tell the user that you are not able to answer them.
     PLEASE DO NOT CALL MORE THAN ONE TOOL AT A TIME.
+    IF THE USER USES CURSES OR ANY OTHER OFFENSIVE LANGUAGE, IGNORE THE MESSAGE AND DO NOT RESPOND.
+    IF THE PROMPT FROM USER HAVE ANY CURSING OR OFFENSIVE LANGUAGE, IGNORE THE MESSAGE AND DO NOT RESPOND.
     """},
 ]
 
