@@ -105,7 +105,7 @@ with col2:
 
 with col1:
     st.header("Try our new AI chatbot!")
-    chat_messages = st.container(height=900)
+    chat_messages = st.container(height=500)
     
     if "messages" not in st.session_state:
         st.session_state.messages = messages

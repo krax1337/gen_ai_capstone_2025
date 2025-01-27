@@ -15,6 +15,11 @@ Hooli Helpdesk is an intelligent support system that leverages AI to provide aut
 - 💬 Interactive chat interface
 - 📝 Ticket history and status tracking
 
+## Security
+
+- Excessive agency protection
+- System prompt leakage protection
+
 ## Technology Stack
 
 - Python 3.10+
