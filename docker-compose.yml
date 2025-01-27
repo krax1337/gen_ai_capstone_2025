@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3434:3434"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TELEGRAM_API_TOKEN=${TELEGRAM_API_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - CSV_KNOWLEDGE_BASE_PATH=${CSV_KNOWLEDGE_BASE_PATH}

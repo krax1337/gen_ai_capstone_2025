@@ -94,6 +94,7 @@ with col2:
     db = TicketDB()
     tickets = db.get_all_tickets()
     tickets_container.dataframe(tickets)
+    st.write("https://t.me/s/gen_ai_capstone_2025")
 
 with col1:
     st.header("Try our new AI chatbot!")
