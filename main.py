@@ -75,13 +75,14 @@ messages = [
     When you are asked a question, you will first search the knowledge base for the answer.
     For the answer, you will use the `get_answer` tool.
     After you have answered the question, you will ask the user if they would like to create a ticket.
-    If they would like to create a ticket, you should get the user's name.
+    If they would like to create a ticket, you should get the user's name. DO NOT ASK FOR THE NAME IF YOU ALREADY HAVE IT.
     And you should determine the level of the ticket based on the question. Based on the question, the level should be LOW, MEDIUM, or HIGH.
     Do not ask the user for the level of the ticket. Just determine it based on the question.
     Also you should rework the question to make it more concise and clear.
     After you have all the information, you will use the `create_ticket` tool to create the ticket.
     Answer the question in a friendly and helpful manner.
     Irrelevant queries should be ignored. Do not answer them and tell the user that you are not able to answer them.
+    PLEASE DO NOT CALL MORE THAN ONE TOOL AT A TIME.
     """},
 ]
 
@@ -121,7 +122,7 @@ with col1:
     spin_me = st.status("System is ready", state="complete")
 
     if prompt := st.chat_input("Ask a question to get started"):
-        logger.info("New user prompt received")
+        logger.info(f"New user prompt received: {prompt}")
         spin_me.update(label="Thinking...", state="running")
         st.session_state.messages.append({"role": "user", "content": prompt})
         
@@ -141,6 +142,7 @@ with col1:
             )
             logger.info("Received response from OpenAI")
             
+            # TODO: Interesting bug with 2 functions called at once. Discuss with team.
             tool_calls = response.choices[0].message.tool_calls or []
             
             if tool_calls:
@@ -153,8 +155,17 @@ with col1:
                             for m in st.session_state.messages
                         ]
                     
-                    temp_messages.append(response.choices[0].message)
-                    temp_messages.append({"role": "tool", "tool_call_id": tool_calls[0].id, "content": str(answer_result)})
+                    temp_messages.append({
+                        "role": "assistant", 
+                        "content": None, 
+                        "tool_calls": response.choices[0].message.tool_calls
+                        })
+                    temp_messages.append({
+                        "role": "tool", 
+                        "tool_call_id": tool_calls[0].id, 
+                        "name": tool_calls[0].function.name, 
+                        "content": str(answer_result)
+                        })
                     inside_completion = client.chat.completions.create(
                         model="gpt-4o-mini",
                         temperature=0,
@@ -176,8 +187,17 @@ with col1:
                             for m in st.session_state.messages
                         ]
                     
-                    temp_messages.append(response.choices[0].message)
-                    temp_messages.append({"role": "tool", "tool_call_id": tool_calls[0].id, "content": str(answer_result)})
+                    temp_messages.append({
+                        "role": "assistant", 
+                        "content": None, 
+                        "tool_calls": response.choices[0].message.tool_calls
+                        })
+                    temp_messages.append({
+                        "role": "tool", 
+                        "tool_call_id": tool_calls[0].id, 
+                        "name": tool_calls[0].function.name, 
+                        "content": str(answer_result)
+                        })
                     inside_completion = client.chat.completions.create(
                         model="gpt-4o-mini",
                         temperature=0,
