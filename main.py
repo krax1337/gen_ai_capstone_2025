@@ -88,9 +88,12 @@ col1, col2 = st.columns([3, 2])
 
 with col2:
     st.header("Opened tickets")
+    tickets_container = st.empty()  # Create a container for tickets that can be updated
+    
+    # Initial display of tickets
     db = TicketDB()
     tickets = db.get_all_tickets()
-    st.dataframe(tickets)
+    tickets_container.dataframe(tickets)
 
 with col1:
     st.header("Try our new AI chatbot!")
@@ -149,6 +152,11 @@ with col1:
                 if tool_calls[0].function.name == "create_ticket":
                     args = json.loads(tool_calls[0].function.arguments)
                     answer_result = create_ticket(args["question"], args["level"], args["person"])
+                    
+                    # Update tickets display after creating a new ticket
+                    tickets = db.get_all_tickets()
+                    tickets_container.dataframe(tickets)
+                    
                     temp_messages = [
                             {"role": m["role"], "content": m["content"]}
                             for m in st.session_state.messages
