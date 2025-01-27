@@ -19,7 +19,6 @@ class TicketDB:
     def create_table(self):
         """Create tickets table if it doesn't exist"""
         with sqlite3.connect(self.db_path) as conn:
-            self.logger.info("Creating tickets table")
             cursor = conn.cursor()
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS tickets (

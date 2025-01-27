@@ -24,9 +24,11 @@ env = environ.Env()
 environ.Env.read_env('.env')
 
 def get_answer(question: str) -> str:
+    logger.info(f"Searching knowledge base for question: {question}")
     kb = ChromaKnowledgeBase()
     kb.initialize_database(env('CSV_KNOWLEDGE_BASE_PATH'))
     result = kb.search_knowledge(question)
+    logger.info("Knowledge base search completed")
     return result
 
 class GetAnswer(BaseModel):
@@ -39,6 +41,7 @@ answer_tool = pydantic_function_tool(
 )
 
 def create_ticket(question: str, level: str, person: str) -> str:
+    logger.info(f"Creating ticket for {person} with level {level}")
     ticket_db = TicketDB()
     ticket = {
         'question': question,
@@ -49,6 +52,7 @@ def create_ticket(question: str, level: str, person: str) -> str:
     ticket_db.add_ticket(ticket)
     telegram_handler = TelegramHandler()
     telegram_handler.send_ticket(ticket)
+    logger.info(f"Ticket created successfully: {ticket['ticket_name']}")
     return ticket
 
 class CreateTicket(BaseModel):
@@ -117,6 +121,7 @@ with col1:
     spin_me = st.status("System is ready", state="complete")
 
     if prompt := st.chat_input("Ask a question to get started"):
+        logger.info("New user prompt received")
         spin_me.update(label="Thinking...", state="running")
         st.session_state.messages.append({"role": "user", "content": prompt})
         
@@ -124,6 +129,7 @@ with col1:
             st.markdown(prompt)
 
         with chat_messages.chat_message("assistant"):
+            logger.info("Making API call to OpenAI")
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 temperature=0,
@@ -133,10 +139,12 @@ with col1:
                     for m in st.session_state.messages
                 ],
             )
+            logger.info("Received response from OpenAI")
             
             tool_calls = response.choices[0].message.tool_calls or []
             
             if tool_calls:
+                logger.info(f"Processing tool call: {tool_calls[0].function.name}")
                 if tool_calls[0].function.name == "get_answer":
                     args = json.loads(tool_calls[0].function.arguments)
                     answer_result = get_answer(args["question"])
@@ -183,4 +191,5 @@ with col1:
                 st.markdown(assistant_message)
             
         st.session_state.messages.append({"role": "assistant", "content": assistant_message})
+        logger.info("Chat interaction completed")
         spin_me.update(label="System is ready", state="complete")
