@@ -6,6 +6,19 @@
 
 Hooli Helpdesk is an intelligent support system that leverages AI to provide automated assistance while maintaining a record of support tickets. The system uses OpenAI's GPT models for natural language processing and ChromaDB for efficient semantic search capabilities.
 
+## How to use the chatbot
+
+1. **Ask a Question**: You can ask the chatbot any question related to the helpdesk.  
+2. **Chatbot Response**:  
+   - If the question is relevant and the chatbot knows the answer, it will provide a response based on the knowledge base.  
+   - If the chatbot cannot answer the question or if you are unsatisfied with the response, it will prompt you to create a support ticket.  
+3. **Create a Ticket**:  
+   - To create a ticket, you will be asked to provide your name.  
+   - Once submitted, the ticket will be sent to the designated Telegram channel and added to the "Opened Tickets" section.  
+4. **Helpdesk Notification**: The helpdesk team will be notified about the new ticket and will work to address it as soon as possible.  
+
+This process ensures your queries are handled efficiently, either through automated responses or direct support from the helpdesk team.
+
 ## Features
 
 - 🤖 AI-powered chatbot for instant support
