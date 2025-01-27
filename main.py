@@ -18,7 +18,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger()
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title="EPAM reference", page_icon="🤩")
 
 env = environ.Env()
 environ.Env.read_env('.env')
