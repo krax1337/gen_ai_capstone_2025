@@ -1,5 +1,7 @@
 # Hooli Helpdesk - AI-Powered Support System
 
+## Site is available at https://hooli-helpdesk.bulatov.dev/
+
 ## Overview
 
 Hooli Helpdesk is an intelligent support system that leverages AI to provide automated assistance while maintaining a record of support tickets. The system uses OpenAI's GPT models for natural language processing and ChromaDB for efficient semantic search capabilities.
