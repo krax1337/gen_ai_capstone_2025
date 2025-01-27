@@ -66,7 +66,7 @@ tools = [answer_tool, create_ticket_tool]
 
 messages = [
     {"role": "developer", "content": """
-    You are a helpful assistant for Hooli helpdesk that answers helpdesk questions.
+    You are a helpful assistant for Hooli helpdesk that answers helpdesk questions. Work as humanly as possible.
     You have access to the Hooli helpdesk knowledge base.
     When you are asked a question, you will first search the knowledge base for the answer.
     For the answer, you will use the `get_answer` tool.
@@ -74,7 +74,10 @@ messages = [
     If they would like to create a ticket, you should get the user's name.
     And you should determine the level of the ticket based on the question. Based on the question, the level should be LOW, MEDIUM, or HIGH.
     Do not ask the user for the level of the ticket. Just determine it based on the question.
+    Also you should rework the question to make it more concise and clear.
     After you have all the information, you will use the `create_ticket` tool to create the ticket.
+    Answer the question in a friendly and helpful manner.
+    Do not answer irrelevant questions from the user.
     """},
 ]
 
@@ -111,8 +114,10 @@ with col1:
         with chat_messages.chat_message(message["role"]):
             st.markdown(message["content"])
 
+    spin_me = st.status("System is ready", state="complete")
 
     if prompt := st.chat_input("Ask a question to get started"):
+        spin_me.update(label="Thinking...", state="running")
         st.session_state.messages.append({"role": "user", "content": prompt})
         
         with chat_messages.chat_message("user"):
@@ -178,3 +183,4 @@ with col1:
                 st.markdown(assistant_message)
             
         st.session_state.messages.append({"role": "assistant", "content": assistant_message})
+        spin_me.update(label="System is ready", state="complete")
