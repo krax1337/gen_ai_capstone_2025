@@ -81,76 +81,79 @@ client = OpenAI(api_key=env('OPENAI_API_KEY'))
 
 st.title("Hooli Helpdesk")
 
-if "messages" not in st.session_state:
-    st.session_state.messages = messages
-
-for message in st.session_state.messages:
-    if message["role"] == "developer":
-        continue
-    if message["role"] == "tool":
-        continue
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-
-if prompt := st.chat_input("Ask a question to get started."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+with st.sidebar:
+    chat_messages = st.container(height=900)
     
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    if "messages" not in st.session_state:
+        st.session_state.messages = messages
 
-    with st.chat_message("assistant"):
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            temperature=0,
-            tools=tools,
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
-        )
+    for message in st.session_state.messages:
+        if message["role"] == "developer":
+            continue
+        if message["role"] == "tool":
+            continue
+        with chat_messages.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+
+    if prompt := st.chat_input("Ask a question to get started."):
+        st.session_state.messages.append({"role": "user", "content": prompt})
         
-        tool_calls = response.choices[0].message.tool_calls or []
-        
-        if tool_calls:
-            if tool_calls[0].function.name == "get_answer":
-                args = json.loads(tool_calls[0].function.arguments)
-                answer_result = get_answer(args["question"])
-                temp_messages = [
-                        {"role": m["role"], "content": m["content"]}
-                        for m in st.session_state.messages
-                    ]
-                
-                temp_messages.append(response.choices[0].message)
-                temp_messages.append({"role": "tool", "tool_call_id": tool_calls[0].id, "content": str(answer_result)})
-                inside_completion = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    temperature=0,
-                    tools=tools,
-                    messages=temp_messages,
-                )
-                assistant_message = inside_completion.choices[0].message.content
+        with chat_messages.chat_message("user"):
+            st.markdown(prompt)
+
+        with chat_messages.chat_message("assistant"):
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                temperature=0,
+                tools=tools,
+                messages=[
+                    {"role": m["role"], "content": m["content"]}
+                    for m in st.session_state.messages
+                ],
+            )
+            
+            tool_calls = response.choices[0].message.tool_calls or []
+            
+            if tool_calls:
+                if tool_calls[0].function.name == "get_answer":
+                    args = json.loads(tool_calls[0].function.arguments)
+                    answer_result = get_answer(args["question"])
+                    temp_messages = [
+                            {"role": m["role"], "content": m["content"]}
+                            for m in st.session_state.messages
+                        ]
+                    
+                    temp_messages.append(response.choices[0].message)
+                    temp_messages.append({"role": "tool", "tool_call_id": tool_calls[0].id, "content": str(answer_result)})
+                    inside_completion = client.chat.completions.create(
+                        model="gpt-4o-mini",
+                        temperature=0,
+                        tools=tools,
+                        messages=temp_messages,
+                    )
+                    assistant_message = inside_completion.choices[0].message.content
+                    st.markdown(assistant_message)
+                if tool_calls[0].function.name == "create_ticket":
+                    args = json.loads(tool_calls[0].function.arguments)
+                    answer_result = create_ticket(args["question"], args["level"], args["person"])
+                    temp_messages = [
+                            {"role": m["role"], "content": m["content"]}
+                            for m in st.session_state.messages
+                        ]
+                    
+                    temp_messages.append(response.choices[0].message)
+                    temp_messages.append({"role": "tool", "tool_call_id": tool_calls[0].id, "content": str(answer_result)})
+                    inside_completion = client.chat.completions.create(
+                        model="gpt-4o-mini",
+                        temperature=0,
+                        tools=tools,
+                        messages=temp_messages,
+                    )
+                    assistant_message = inside_completion.choices[0].message.content
+                    st.markdown(assistant_message)
+            else:
+                assistant_message = response.choices[0].message.content
                 st.markdown(assistant_message)
-            if tool_calls[0].function.name == "create_ticket":
-                args = json.loads(tool_calls[0].function.arguments)
-                answer_result = create_ticket(args["question"], args["level"], args["person"])
-                temp_messages = [
-                        {"role": m["role"], "content": m["content"]}
-                        for m in st.session_state.messages
-                    ]
-                
-                temp_messages.append(response.choices[0].message)
-                temp_messages.append({"role": "tool", "tool_call_id": tool_calls[0].id, "content": str(answer_result)})
-                inside_completion = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    temperature=0,
-                    tools=tools,
-                    messages=temp_messages,
-                )
-                assistant_message = inside_completion.choices[0].message.content
-                st.markdown(assistant_message)
-        else:
-            assistant_message = response.choices[0].message.content
-            st.markdown(assistant_message)
-        
-    st.session_state.messages.append({"role": "assistant", "content": assistant_message})
+            
+        st.session_state.messages.append({"role": "assistant", "content": assistant_message})
