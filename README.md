@@ -19,6 +19,12 @@ Hooli Helpdesk is an intelligent support system that leverages AI to provide aut
 
 This process ensures your queries are handled efficiently, either through automated responses or direct support from the helpdesk team.
 
+## Roadmap
+
+- [ ] DeepSeek integration
+- [ ] Langchain integration
+- [ ] Update embeddings model through UI
+
 ## Features
 
 - 🤖 AI-powered chatbot for instant support
